@@ -16,7 +16,7 @@ head(NI_postcode, n=10)
 col_names <- c("Organisation Name",
                "Sub-building Name",
                "Building Name",
-               "Number2",
+               "Number",
                "Primary Thorfare",
                "Alt Thorfare",
                "Secondary Thorfare",
@@ -32,9 +32,29 @@ col_names <- c("Organisation Name",
 names(NI_postcode)[1:15] <- col_names
 str(NI_postcode)
 
-my_na  <- NI_postcode[!complete.cases(NI_postcode),]
-nrow(my_na)
 
+#C
+#replace blanks with NA
 NI_postcode[NI_postcode == ""] <- NA
 str(NI_postcode)
+
+
+#D
+#find the na vlaues in each row
+#Use sapply to iterate over all columns and get the sum of the NA values
+na_count <-sapply(NI_postcode, function(y) sum(length(which(is.na(y)))))
+#convert to dataframe to see the values easier
+na_count <- data.frame(na_count)
+na_count
+
+
+#E
+#Use subset to move primary key to begining
+NI_postcode <- subset(NI_postcode, select=c(15,1:15))
+
+
+#f
+
+Limavady_data <- 
+
 
