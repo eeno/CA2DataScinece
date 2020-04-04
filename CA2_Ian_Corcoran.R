@@ -193,11 +193,15 @@ get_town_info <- function(df1,df2){
 
 get_town_info(AllNICrimeData,village)
 
-unique(status_Loc)
+stat_Freq <- table(AllNICrimeData$Crime.type,AllNICrimeData$Status)
+stat_Freq
+prop.table(stat_Freq) * 100
 
-AllNICrimeData$Location <-   trimws(AllNICrimeData$Location)
 
-status_Loc <- (match(AllNICrimeData$Location, village$Location))
-status_Loc <- ifelse(!is.na(status_Loc),status_Loc,NA)
-status_Loc <- na.omit(status_Loc)
-status_Loc
+#I
+new_df <- AllNICrimeData[!is.na(AllNICrimeData$Location),]
+random_crime_sample <-  new_df[sample(1:nrow(new_df), 1000),]
+random_crime_sample
+
+#random_crime_sample <- AllNICrimeData[!is.na(sample(1:nrow(AllNICrimeData),1000,replace = TRUE)),]
+random_crime_sample <- subset() 
