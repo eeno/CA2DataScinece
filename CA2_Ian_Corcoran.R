@@ -93,6 +93,8 @@ ff <- list.files(dir, pattern = "*.csv", recursive = TRUE, full.names = TRUE)
 
 #read all csv files into a datframe
 AllNICrimeData <- do.call(rbind, lapply(ff, read.csv))
+ nrow(AllNICrimeData)
+
 
 
 #b
@@ -112,15 +114,16 @@ str(AllNICrimeData)
 AllNICrimeData$Crime.type <- as.character(AllNICrimeData$Crime.type)
 
 crime_list <- c("Anti-social behaviour","Bicycle theft", "Burglary","Criminal damage and arson",
-                "DRUGS","Other Theft", "Public order","Robbery", "Shoplifting",
+                "Drugs","Other theft", "Public order","Robbery", "Shoplifting",
                 "Theft from the person","Vehicle crime", "Violence and sexual offences")
 
 attach(AllNICrimeData)
+AllNICrimeData$Crime.type[Crime.type != crime_list] <- "OTCR"
 AllNICrimeData$Crime.type[Crime.type == "Anti-social behaviour"] <- "ASBO"
 AllNICrimeData$Crime.type[Crime.type == "Bicycle theft"] <- "BITH"
 AllNICrimeData$Crime.type[Crime.type == "Burglary"] <- "BURG"
 AllNICrimeData$Crime.type[Crime.type == "Criminal damage and arson"] <- "CDAR"
-AllNICrimeData$Crime.type[Crime.type == "DRUGS"] <- "DRUG"
+AllNICrimeData$Crime.type[Crime.type == "Drugs"] <- "DRUG"
 AllNICrimeData$Crime.type[Crime.type == "Other Theft"] <- "OTTH"
 AllNICrimeData$Crime.type[Crime.type == "Public order"] <- "PUBO"
 AllNICrimeData$Crime.type[Crime.type == "Robbery"] <- "ROBY"
@@ -128,58 +131,97 @@ AllNICrimeData$Crime.type[Crime.type == "Shoplifting"] <- "SHOP"
 AllNICrimeData$Crime.type[Crime.type == "Theft from the person"] <- "THPR"
 AllNICrimeData$Crime.type[Crime.type == "Vehicle crime"] <- "VECR"
 AllNICrimeData$Crime.type[Crime.type == "Violence and sexual offences"] <- "VISO"
-AllNICrimeData$Crime.type[Crime.type != crime_list] <- "OTCR"
 detach(AllNICrimeData)
 
-
+unique(AllNICrimeData$Crime.type)
 #d
 
-
+#create a frequncy table for crimes
 CrimeFreq <- table(AllNICrimeData$Crime.type)
 
+#create a proprtion table of crime
 CrimeFreq <- prop.table(CrimeFreq)
 CrimeFreq
 
-#E
-barplot(height = CrimeFreq,
+
+ plot( CrimeFreq,
+        type = "h",
         main = "Frequency by Crime Type", 
         ylab = "Frequency", 
         xlab = "Crime Type",
         col = "blue")
 
+ barplot( height <- CrimeFreq,
+       main = "Frequency by Crime Type", 
+       ylab = "Frequency", 
+       xlab = "Crime Type",
+       col = "blue")
+ 
 
-#F
+#factor type column
 AllNICrimeData$Crime.type <- factor(AllNICrimeData$Crime.type, ordered = FALSE)
 
 str(AllNICrimeData)
 
 
-#G
+#E
 #drop the words on or near from location
+
+#check the unique locations
 unique(AllNICrimeData$Location)
 
-drop_words <- c("On or near")
+drop_words <- c("On or near ")
 
 AllNICrimeData$Location <-  gsub(drop_words, "" ,AllNICrimeData$Location)
 #AllNICrimeData$Location <- sapply(1:nrow(AllNICrimeData), function (x) gsub(drop_words, "" ,AllNICrimeData$Location))
 
 #replace blanks wit na
-AllNICrimeData$Location[AllNICrimeData$Location == " "] <- NA
+AllNICrimeData$Location[AllNICrimeData$Location == ""] <- NA
 sum(is.na(AllNICrimeData$Location))
 str(AllNICrimeData$Location)
 
 
 
-#h create a funtion to combine ni crome data and poulaation and status to the crime data
+#f choose 5000 random varaibles and create a function to return town name
+new_df <- AllNICrimeData[!is.na(AllNICrimeData$Location),]
+set.seed(100)
+random_crime_sample <-  new_df[sample(1:nrow(new_df), 5000),]
+random_crime_sample
+unique(random_crime_sample$Location)
 
-village <- read.csv("VillageList.csv")
-#rename first column in village list
-names(village)[1] <- "Location"
 
-#testdf <- merge(AllNICrimeData,village, by= "Location")
+
+
+
+#g create a funtion to combine ni crime data and poulaation and status to the crime data
+
+find_a_town <- function(baseframe, lookupframe){
+  
+  #assign(baseframe$Location <- as.character(baseframe$Location))
+  eval.parent(substitute( baseframe$Location <- assign(baseframe$Location,toupper(baseframe$Location))))
+  
+  
+  
+  
+  town_Loc <- lookupframe$Town[match(baseframe$Location, lookupframe$Primary.Thorfare)]
+  eval.parent(substitute(baseframe["Town"] <- town_Loc))
+  
+  return(baseframe)
+  
+}
+
+
+find_a_town(random_crime_sample, CleanNIPostcodeData)
+
+str(CleanNIPostcodeData)
+
+CleanNIPostcodeData <- read.csv("CleanNIPostcodeData.csv")
+
+
+
 get_town_info <- function(df1,df2){
   
-  #df1$Location <- newcol
+  
   
   status_Loc <- df2$STATUS[match(df1$Location, df2$Location)]  
   pop_loc    <- df2$POPULATION[match(df1$Location, df2$Location)]
@@ -198,10 +240,7 @@ stat_Freq
 prop.table(stat_Freq) * 100
 
 
-#I
-new_df <- AllNICrimeData[!is.na(AllNICrimeData$Location),]
-random_crime_sample <-  new_df[sample(1:nrow(new_df), 1000),]
-random_crime_sample
+
 
 #random_crime_sample <- AllNICrimeData[!is.na(sample(1:nrow(AllNICrimeData),1000,replace = TRUE)),]
 random_crime_sample <- subset() 
