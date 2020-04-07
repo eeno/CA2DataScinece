@@ -144,7 +144,7 @@ CrimeFreq <- prop.table(CrimeFreq)
 CrimeFreq
 
 
- plot( CrimeFreq,
+ plot(  table(AllNICrimeData$Crime.type) ,  #CrimeFreq
         type = "h",
         main = "Frequency by Crime Type", 
         ylab = "Frequency", 
@@ -179,6 +179,9 @@ AllNICrimeData$Location <-  gsub(drop_words, "" ,AllNICrimeData$Location)
 AllNICrimeData$Location[AllNICrimeData$Location == ""] <- NA
 sum(is.na(AllNICrimeData$Location))
 str(AllNICrimeData$Location)
+
+
+
 
 
 
@@ -219,28 +222,56 @@ CleanNIPostcodeData <- read.csv("CleanNIPostcodeData.csv")
 
 
 
-get_town_info <- function(df1,df2){
+get_town_info <- function(baseframe,lookupframe){
   
+  lookupframe$Location <- toupper((lookupframe$Location))
+  #eval.parent(substitute( baseframe$Location <- assign(baseframe$Location,toupper(baseframe$Location))))
   
+  pop_loc <- lookupframe$POPULATION[match(baseframe$Town, lookupframe$Location)]
+    eval.parent(substitute(baseframe["Population"] <- pop_loc))
   
-  status_Loc <- df2$STATUS[match(df1$Location, df2$Location)]  
-  pop_loc    <- df2$POPULATION[match(df1$Location, df2$Location)]
-    eval.parent(substitute(df1["Status"] <- status_Loc))
-    eval.parent(substitute(df1["Population"] <- pop_loc))
-  
-  return(df1)
+  return(baseframe)
   
 }
+get_town_info(random_crime_sample,village)
 
 
-get_town_info(AllNICrimeData,village)
+write.csv(random_crime_sample,"random_crime_sample.csv")
 
-stat_Freq <- table(AllNICrimeData$Crime.type,AllNICrimeData$Status)
-stat_Freq
-prop.table(stat_Freq) * 100
 
+random_crime_sample$Town <- as.character(random_crime_sample$Town)
 
 
 
-#random_crime_sample <- AllNICrimeData[!is.na(sample(1:nrow(AllNICrimeData),1000,replace = TRUE)),]
-random_crime_sample <- subset() 
+
+Belfast_data <- random_crime_sample[random_crime_sample$Town == "BELFAST",]
+Belfast_data <- Belfast_data[complete.cases(Belfast_data$Town),]
+Belfast_Freq <- table(Belfast_data$Crime.type )
+
+Derry_data <- random_crime_sample[random_crime_sample$Town == "LONDONDERRY",]
+Derry_data <- Derry_data[complete.cases(Derry_data$Town),]
+Derry_Freq <- table(Derry_data$Crime.type )
+
+str(random_crime_sample)
+
+par(mfrow=c(1,2))
+
+plot(  Belfast_Freq ,  #CrimeFreq
+       type = "h",
+       main = "Frequency by Crime Type Belfast", 
+       ylab = "Frequency", 
+       xlab = "Crime Type",
+       col = "blue")
+
+
+
+
+plot(  Derry_Freq ,  #CrimeFreq
+       type = "h",
+       main = "Frequency by Crime Type Derry", 
+       ylab = "Frequency", 
+       xlab = "Crime Type",
+       col = "blue")
+
+par(mfrow=c(1,2))
+
