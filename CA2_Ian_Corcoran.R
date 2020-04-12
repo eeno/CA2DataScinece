@@ -1,7 +1,10 @@
+#CA 2 for data science.
+#all data sets were stored in the working directory
+#---------------------------------------------------------------------------------------------
+
 #Section 1
 #A
 
-rm(NI_postcode)
 
 #import data
 NI_postcode <- read.csv("NIPostcodes.csv", header = FALSE)
@@ -12,7 +15,7 @@ nrow(NI_postcode)
 str(NI_postcode)
 #show top 10 rows
 head(NI_postcode, n=10)
-
+#---------------------------------------------------------------------------------------
 
 #B
 #add titles to the attributes
@@ -37,13 +40,13 @@ col_names <- c("Organisation Name",
 #use names function to apply all names form col_names vector to dataset
 names(NI_postcode)[1:15] <- col_names
 str(NI_postcode)
-
+#-----------------------------------------------------------------------------------------
 
 #C
 #replace blanks with NA
 NI_postcode[NI_postcode == ""] <- NA
 str(NI_postcode)
-
+#---------------------------------------------------------------------------------------
 
 #D
 #find the empty vlaues in each column
@@ -54,19 +57,22 @@ blank_count <- data.frame(blank_count)
 #view the blank counts
 blank_count
 
+
+
+
 #find the na vlaues in each column
 #Use sapply to iterate over all columns and get the sum of the NA values
 na_count <-sapply(NI_postcode, function(y) sum(length(which(is.na(y)))))
 #convert to dataframe for easy interpratation
 na_count <- data.frame(na_count)
 na_count
-
+#----------------------------------------------------------------------------------------
 
 #E
 #Use subset to move primary key to begining
 NI_postcode <- subset(NI_postcode, select=c(15,1:14))
 str(NI_postcode)
-
+#----------------------------------------------------------------------------------------
 
 #f
 #display onlyinfromation where locality, townland and town conatin Limavady
@@ -85,7 +91,7 @@ str(Limavady_data)
 
 #save in a csv
 write.csv(Limavady_data,"Limavady.csv")
-
+#----------------------------------------------------------------------------------------
 
 #g
 #save the modified postcode data to working directory 
@@ -110,6 +116,7 @@ AllNICrimeData <- do.call(rbind, lapply(all_data, read.csv))
 nrow(AllNICrimeData)
 
 str(AllNICrimeData)
+#----------------------------------------------------------------------------------------
 
 #b
 #need to drop certain columns, create a vector of column anmes
@@ -119,7 +126,7 @@ cols_to_drop <- c("Crime.ID", "Reported.By", "Falls.within", "LSOA.code", "LSOA.
 #drop any column in the "cols_to_drop" vector
 AllNICrimeData <- AllNICrimeData[,!names(AllNICrimeData) %in% cols_to_drop]
 str(AllNICrimeData)
-
+#----------------------------------------------------------------------------------------
 
 #C 
 #shorten crime type names
@@ -151,35 +158,30 @@ AllNICrimeData$Crime.type[Crime.type == "Violence and sexual offences"] <- "VISO
 detach(AllNICrimeData)
  #check unique names to make sure all names were changed
 unique(AllNICrimeData$Crime.type)
+#----------------------------------------------------------------------------------------
 #d
 
 #create a frequncy table for crimes
 CrimeFreq <- table(AllNICrimeData$Crime.type)
 
-#create a proprtion table of crime
-CrimeFreq <- prop.table(CrimeFreq)
-CrimeFreq
 
 
- plot(  table(AllNICrimeData$Crime.type) ,  #CrimeFreq
-        type = "h",
-        main = "Frequency by Crime Type", 
-        ylab = "Frequency", 
-        xlab = "Crime Type",
-        col = "blue")
+#plot the results from the crimefreq table
+ plot(  table(AllNICrimeData$Crime.type) ,  
+        type = "h",    # gives a histogram output
+        main = "Frequency by Crime Type",  #Chart label
+        ylab = "Frequency",   #y-axis frequncy
+        xlab = "Crime Type", #x-axis frequncy
+        col = "blue") #blue bars for the chart
 
- barplot( height <- CrimeFreq,
-       main = "Frequency by Crime Type", 
-       ylab = "Frequency", 
-       xlab = "Crime Type",
-       col = "blue")
+
  
 
 #factor type column
 AllNICrimeData$Crime.type <- factor(AllNICrimeData$Crime.type, ordered = FALSE)
 
 str(AllNICrimeData)
-
+#----------------------------------------------------------------------------------------
 
 #E
 #drop the words on or near from location
@@ -197,7 +199,7 @@ AllNICrimeData$Location[AllNICrimeData$Location == ""] <- NA
 sum(is.na(AllNICrimeData$Location))
 str(AllNICrimeData)
 
-
+#----------------------------------------------------------------------------------------
 
 
 
@@ -244,7 +246,7 @@ find_a_town(random_crime_sample, CleanNIPostcodeData)
 
 str(random_crime_sample)
 
-
+#----------------------------------------------------------------------------------------
 
 #g 
 
@@ -275,7 +277,7 @@ get_town_info(random_crime_sample,village)
 
 
 str(random_crime_sample)
-
+#----------------------------------------------------------------------------------------
 
 #h
 #drop the "reported by" column
@@ -289,7 +291,7 @@ write.csv(random_crime_sample,"random_crime_sample.csv")
 
 random_crime_sample$Town <- as.character(random_crime_sample$Town)
 
-
+#----------------------------------------------------------------------------------------
 #i
 #split data into belfats data and derry data
 
